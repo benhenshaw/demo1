@@ -35,6 +35,7 @@ int main()
 
     u64 target_frame_rate = 60;
     u64 ticks_per_second = SDL_GetPerformanceFrequency();
+    assert(ticks_per_second == 1000000000);
     u64 ticks_per_frame = ticks_per_second / target_frame_rate;
     u64 ticks_per_millisecond = ticks_per_second / 1000;
 
