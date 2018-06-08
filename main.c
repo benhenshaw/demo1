@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stdbool.h>
+#include <time.h>
 #include <SDL2/SDL.h>
 #define assert SDL_assert
 
@@ -49,12 +50,26 @@ int main()
             }
         }
 
-        while (SDL_GetPerformanceCounter() - time_stamp <
-                ticks_per_frame - ticks_per_millisecond)
+        memset(pixels, 0, 640 * 480 * 4);
+
+        for (int y = 0; y < 480; ++y)
         {
-            SDL_Delay(1);
+            int x = (time_stamp / 5000000) % 640;
+            pixels[x + y * 640] = ~0;
         }
 
         SDL_UpdateWindowSurface(window);
+
+        if (SDL_GetPerformanceCounter() - time_stamp < ticks_per_frame - ticks_per_millisecond)
+        {
+            struct timespec sleep_time = {
+                .tv_nsec = (ticks_per_frame - (ticks_per_millisecond * 2))
+                    - (SDL_GetPerformanceCounter() - time_stamp)
+             };
+            nanosleep(&sleep_time, NULL);
+            while (SDL_GetPerformanceCounter() - time_stamp < ticks_per_frame);
+        }
+
+        printf("%f\n", (SDL_GetPerformanceCounter() - time_stamp) / (double)ticks_per_second);
     }
 }
