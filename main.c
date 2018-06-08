@@ -56,7 +56,8 @@ int main()
 
         for (int y = 0; y < 480; ++y)
         {
-            int x = (time_stamp / 5000000) % 640;
+            int x = 0;
+            SDL_GetMouseState(&x, NULL);
             pixels[x + y * 640] = ~0;
         }
 
@@ -71,7 +72,5 @@ int main()
             nanosleep(&sleep_time, NULL);
             while (SDL_GetPerformanceCounter() - time_stamp < ticks_per_frame);
         }
-
-        printf("%f\n", (SDL_GetPerformanceCounter() - time_stamp) / (double)ticks_per_second);
     }
 }
