@@ -18,6 +18,17 @@ int main()
     u32 * pixels = SDL_GetWindowSurface(window)->pixels;
     assert(pixels);
 
+    SDL_AudioSpec audio_spec_request = {
+        .format   = AUDIO_F32,
+        .freq     = 48000,
+        .channels = 2,
+        .samples  = 512,
+    };
+
+    int audio_device = SDL_OpenAudioDevice(NULL, false,
+        &audio_spec_request, NULL, 0);
+    assert(audio_device);
+
     while (true)
     {
         SDL_Event event;
