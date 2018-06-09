@@ -5,9 +5,21 @@
 #include <SDL2/SDL.h>
 #define assert SDL_assert
 
+typedef uint8_t u8;
 typedef uint32_t u32;
 typedef uint64_t u64;
 typedef float f32;
+
+void audio_callback(void * data, u8 * stream, int byte_count)
+{
+    f32 * samples = (f32 *)stream;
+    int sample_count = byte_count / sizeof(f32);
+    for (int i = 0; i < sample_count; i += 2)
+    {
+        samples[i+0] = 0.0f;
+        samples[i+1] = 0.0f;
+    }
+}
 
 int main()
 {
@@ -27,11 +39,14 @@ int main()
         .freq     = 48000,
         .channels = 2,
         .samples  = 512,
+        .callback = audio_callback,
     };
 
     int audio_device = SDL_OpenAudioDevice(NULL, false,
         &audio_spec_request, NULL, 0);
     assert(audio_device);
+
+    SDL_PauseAudioDevice(audio_device, false);
 
     u64 target_frame_rate = 60;
     u64 ticks_per_second = SDL_GetPerformanceFrequency();
