@@ -34,15 +34,15 @@ int main()
     int audio_device = SDL_OpenAudioDevice(NULL, false, &audio_spec_request, NULL, 0);
     assert(audio_device);
 
-    u64 target_frame_rate = 30;
+    u64 target_frame_rate = 60;
 
     int samples_per_frame = (48000 / target_frame_rate) * 2;
     f32 * audio_buffer = malloc(samples_per_frame * sizeof(f32));
 
     for (int i = 0; i < samples_per_frame; i += 2)
     {
-        audio_buffer[i+0] = sinf((f32)i/samples_per_frame * M_PI * 8.0f);
-        audio_buffer[i+1] = sinf((f32)i/samples_per_frame * M_PI * 8.0f);
+        audio_buffer[i+0] = sinf((f32)i/samples_per_frame * M_PI * 8.0f) * 0.1f;
+        audio_buffer[i+1] = sinf((f32)i/samples_per_frame * M_PI * 8.0f) * 0.1f;
     }
 
     SDL_PauseAudioDevice(audio_device, false);
@@ -62,6 +62,19 @@ int main()
             if (event.type == SDL_QUIT)
             {
                 exit(0);
+            }
+            else if (event.type == SDL_MOUSEMOTION)
+            {
+                f32 mx = event.motion.x;
+                mx /= 640;
+                mx *= 2.0f;
+                mx -= 1.0f;
+                mx *= 0.1f;
+                for (int i = 0; i < samples_per_frame; i += 2)
+                {
+                    audio_buffer[i+0] = sinf((f32)i/samples_per_frame * M_PI * 8.0f) * (0.1f - mx);
+                    audio_buffer[i+1] = sinf((f32)i/samples_per_frame * M_PI * 8.0f) * (0.1f + mx);
+                }
             }
         }
 
