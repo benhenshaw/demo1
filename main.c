@@ -21,8 +21,9 @@ int main()
         640, 480, 0);
     assert(window);
 
-    u32 * pixels = SDL_GetWindowSurface(window)->pixels;
-    assert(pixels);
+    SDL_Surface * screen_surface = SDL_GetWindowSurface(window);
+    assert(screen_surface);
+    u32 * pixels = screen_surface->pixels;
 
     SDL_AudioSpec audio_spec_request = {
         .format   = AUDIO_F32,
