@@ -30,22 +30,22 @@ int main()
         .channels = 2,
         .samples  = 512,
     };
-
     int audio_device = SDL_OpenAudioDevice(NULL, false, &audio_spec_request, NULL, 0);
     assert(audio_device);
 
-    int samples_per_frame = 800 * 2;
+    u64 target_frame_rate = 30;
+
+    int samples_per_frame = (48000 / target_frame_rate) * 2;
     f32 * audio_buffer = malloc(samples_per_frame * sizeof(f32));
 
     for (int i = 0; i < samples_per_frame; i += 2)
     {
-        audio_buffer[i+0] = sinf((f32)i/samples_per_frame * M_PI * 4.0f);
-        audio_buffer[i+1] = sinf((f32)i/samples_per_frame * M_PI * 4.0f);
+        audio_buffer[i+0] = sinf((f32)i/samples_per_frame * M_PI * 8.0f);
+        audio_buffer[i+1] = sinf((f32)i/samples_per_frame * M_PI * 8.0f);
     }
 
     SDL_PauseAudioDevice(audio_device, false);
 
-    u64 target_frame_rate = 60;
     u64 ticks_per_second = SDL_GetPerformanceFrequency();
     assert(ticks_per_second == 1000000000);
     u64 ticks_per_frame = ticks_per_second / target_frame_rate;
