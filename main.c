@@ -5,21 +5,11 @@
 #include <SDL2/SDL.h>
 #define assert SDL_assert
 
-typedef uint8_t u8;
+typedef uint8_t  u8;
 typedef uint32_t u32;
 typedef uint64_t u64;
+typedef int64_t  s64;
 typedef float f32;
-
-void audio_callback(void * data, u8 * stream, int byte_count)
-{
-    f32 * samples = (f32 *)stream;
-    int sample_count = byte_count / sizeof(f32);
-    for (int i = 0; i < sample_count; i += 2)
-    {
-        samples[i+0] = 0.0f;
-        samples[i+1] = 0.0f;
-    }
-}
 
 int main()
 {
@@ -39,12 +29,19 @@ int main()
         .freq     = 48000,
         .channels = 2,
         .samples  = 512,
-        .callback = audio_callback,
     };
 
-    int audio_device = SDL_OpenAudioDevice(NULL, false,
-        &audio_spec_request, NULL, 0);
+    int audio_device = SDL_OpenAudioDevice(NULL, false, &audio_spec_request, NULL, 0);
     assert(audio_device);
+
+    int samples_per_frame = 800 * 2;
+    f32 * audio_buffer = malloc(samples_per_frame * sizeof(f32));
+
+    for (int i = 0; i < samples_per_frame; i += 2)
+    {
+        audio_buffer[i+0] = sinf((f32)i/samples_per_frame * M_PI * 4.0f);
+        audio_buffer[i+1] = sinf((f32)i/samples_per_frame * M_PI * 4.0f);
+    }
 
     SDL_PauseAudioDevice(audio_device, false);
 
@@ -66,6 +63,8 @@ int main()
                 exit(0);
             }
         }
+
+        SDL_QueueAudio(audio_device, audio_buffer, samples_per_frame * sizeof(f32));
 
         memset(pixels, 0, 640 * 480 * 4);
 
